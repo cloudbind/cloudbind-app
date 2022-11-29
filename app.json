@@ -1,8 +1,10 @@
 {
   "expo": {
     "name": "CloudBind",
-    "slug": "CloudBind",
+    "slug": "cloudbind",
     "version": "1.0.0",
+    "owner": "yb26",
+    "scheme": "cloudbind",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -14,13 +16,26 @@
     "updates": {
       "fallbackToCacheTimeout": 0
     },
+    "plugins": [
+      [
+        "expo-media-library",
+        {
+          "photosPermission": "Allow $(PRODUCT_NAME) to access your photos.",
+          "savePhotosPermission": "Allow $(PRODUCT_NAME) to save photos.",
+          "isAccessMediaLocationEnabled": "true",
+          "externalStoragePermission": "Allow $(PRODUCT_NAME) to access your external storage."
+        }
+      ]
+    ],
     "assetBundlePatterns": [
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.cloudbind.isheretorock"
     },
     "android": {
+      "package": "com.cloudbind.isheretorock",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
