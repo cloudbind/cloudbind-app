@@ -127,6 +127,7 @@ export default function Login({ navigation }) {
           placeholder="Password"
           onChangeText={(val) => setPassword(val)}
           value={password}
+          secureTextEntry={true}
         />
         <View style={styles.button}>
           <Button
