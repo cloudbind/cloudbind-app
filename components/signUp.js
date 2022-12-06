@@ -12,6 +12,7 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import Animated, { RollInLeft, RollInRight, LightSpeedInLeft, LightSpeedInRight, RollOutRight, RollOutLeft } from "react-native-reanimated";
 import * as env from "../env.js";
 
 export default function SignUp({ navigation }) {
@@ -94,7 +95,7 @@ export default function SignUp({ navigation }) {
         <View style={styles.container2}>
           {
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>{selectedOption.toUpperCase()}</Text>
+              <Animated.Text entering={LightSpeedInLeft} exiting={LightSpeedInRight} style={styles.label}>{selectedOption.toUpperCase()}</Animated.Text>
               <TextInput
                 style={styles.input}
                 placeholder={selectedOption}
@@ -176,6 +177,7 @@ export default function SignUp({ navigation }) {
           {selectedOption !== "confirmPassword" ? (
             <View style={styles.nextPrev}>
               <View style={styles.button}>
+                <Animated.View entering={RollInLeft.duration(500)} exiting={RollOutLeft.duration(500)}>
                 <Button
                   title="Previous"
                   color="black"
@@ -186,8 +188,10 @@ export default function SignUp({ navigation }) {
                     }
                   }}
                 />
+                </Animated.View>
               </View>
               <View style={styles.button}>
+              <Animated.View entering={RollInRight.duration(500)} exiting={RollOutRight}>
                 <Button
                   title="Next"
                   color="black"
@@ -196,11 +200,13 @@ export default function SignUp({ navigation }) {
                     setSelectedOption(optionsList[index + 1]);
                   }}
                 />
+                </Animated.View>
               </View>
             </View>
           ) : (
             <View style={styles.nextPrev}>
               <View style={styles.button}>
+              <Animated.View entering={RollInLeft.duration(500)} exiting={RollOutLeft.duration(500)}>
                 <Button
                   title="Previous"
                   color="black"
@@ -211,6 +217,7 @@ export default function SignUp({ navigation }) {
                     }
                   }}
                 />
+                </Animated.View>
               </View>
               <View style={styles.button}>
                 <Button

@@ -6,7 +6,17 @@ import { TextInput, View, StyleSheet, Text } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Lottie from "lottie-react-native";
 import { FontAwesome5 } from "@expo/vector-icons";
-import * as env from "../env.js"
+import Animated, {
+  SlideInUp,
+  SlideInDown,
+  SlideInLeft,
+  SlideOutRight,
+  SlideInRight,
+  FadeIn,
+  FadeOut,
+  Layout,
+} from "react-native-reanimated";
+import * as env from "../env.js";
 import axios from "axios";
 
 WebBrowser.maybeCompleteAuthSession();
@@ -24,25 +34,21 @@ export default function Login({ navigation }) {
   const [password, setPassword] = React.useState(null);
 
   const handleLogin = async () => {
-    const response = await axios.post(
-      env.RootApi + "/cloudbind/login",
-      {
-        email: email.trim(),
-        password: password.trim(),
-      }
-    );
-    if(response.status === 200){
+    const response = await axios.post(env.RootApi + "/cloudbind/login", {
+      email: email.trim(),
+      password: password.trim(),
+    });
+    if (response.status === 200) {
       const user = JSON.stringify(response.data.data.user);
       await AsyncStorage.setItem("token", response.data.data.token);
       await AsyncStorage.setItem("user", user);
-      if(!(response.data.data.user.isActivated)){
-      navigation.replace("Activate");
+      if (!response.data.data.user.isActivated) {
+        navigation.replace("Activate");
       } else {
         navigation.replace("Home");
       }
-    }
-    else{
-      alert("Invalid Credentials!")
+    } else {
+      alert("Invalid Credentials!");
     }
     // if (email.trim() === "xxx" && password.trim() === "xxx") {
     //   await AsyncStorage.setItem("token", "abc");
@@ -55,52 +61,59 @@ export default function Login({ navigation }) {
       const { access_token } = response.params;
       console.log(access_token);
       async function getUserInfo() {
-        try{
-        const userInfoResponse = await axios.post(
-          env.RootApi+"/google/signin",
-          {
-            accessToken: access_token,
-          },
-          {
-            headers: {
-              "Content-Type": "application/json",
+        try {
+          const userInfoResponse = await axios.post(
+            env.RootApi + "/google/signin",
+            {
+              accessToken: access_token,
             },
-          }
-        );
-        if(userInfoResponse.status === 200 || userInfoResponse.status === 201){
-          const user = JSON.stringify(userInfoResponse.data.data.user);
-          console.log(user.username);
-          await AsyncStorage.setItem("token", userInfoResponse.data.data.token);
-          await AsyncStorage.setItem("user", user);
-          if(user.username === null || user.username === undefined){
-          navigation.replace("EnterUsername");
+            {
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          );
+          if (
+            userInfoResponse.status === 200 ||
+            userInfoResponse.status === 201
+          ) {
+            const user = JSON.stringify(userInfoResponse.data.data.user);
+            console.log(user.username);
+            await AsyncStorage.setItem(
+              "token",
+              userInfoResponse.data.data.token
+            );
+            await AsyncStorage.setItem("user", user);
+            if (user.username === null || user.username === undefined) {
+              navigation.replace("EnterUsername");
+            } else {
+              navigation.replace("Home");
+            }
           } else {
-            navigation.replace("Home");
+            alert("Something went wrong!");
           }
-        }
-        else{
-          alert("Something went wrong!")
-        }
         } catch (error) {
           console.log(error);
         }
-        
       }
       getUserInfo();
-
     }
     const checkToken = async () => {
       const token = await AsyncStorage.getItem("token");
       if (token) {
         let user = await AsyncStorage.getItem("user");
         user = JSON.parse(user);
-        if(user.loginProvider === 'GOOGLE' && user.username === null || user.username === undefined){
+        if (
+          (user.loginProvider === "GOOGLE" && user.username === null) ||
+          user.username === undefined
+        ) {
           navigation.replace("EnterUsername");
-        }
-        else if(user.loginProvider === 'CLOUD BIND' && user.isActivated === false){
+        } else if (
+          user.loginProvider === "CLOUD BIND" &&
+          user.isActivated === false
+        ) {
           navigation.replace("Activate");
-        }
-        else{
+        } else {
           navigation.replace("Home");
         }
       }
@@ -108,11 +121,20 @@ export default function Login({ navigation }) {
     checkToken();
   }, [response]);
 
-
   return (
-    <View style={styles.container}>
+    <Animated.View
+      style={styles.container}
+      entering={FadeIn}
+      exiting={FadeOut}
+      layout={Layout.duration(400)}
+    >
       <View style={styles.container}>
-        <Lottie source={require("../assets/animation.json")} loop autoPlay style={{width: 250, marginVertical: 40}}/>
+        <Lottie
+          source={require("../assets/animation.json")}
+          loop
+          autoPlay
+          style={{ width: 250, marginVertical: 40 }}
+        />
       </View>
       <Text style={styles.title}>Login</Text>
       <View style={styles.container2}>
@@ -139,13 +161,19 @@ export default function Login({ navigation }) {
           />
         </View>
         <View style={styles.signup}>
-          <Text style={styles.text}>Don't have an account?</Text>
+            <Text style={styles.signupText}>Don't have an account?</Text>
           <TouchableOpacity
             onPress={() => {
               navigation.navigate("Signup");
             }}
           >
-            <Text style={styles.text2}> Sign Up</Text>
+            <Animated.View
+              entering={SlideInRight.duration(1200).delay(800)}
+              exiting={SlideOutRight}
+              // layout={Layout.duration(1200).delay(5000)}
+            >
+              <Text style={styles.text2}> Sign Up</Text>
+            </Animated.View>
           </TouchableOpacity>
         </View>
         <View style={{ flexDirection: "row", alignItems: "center" }}>
@@ -155,19 +183,26 @@ export default function Login({ navigation }) {
           </View>
           <View style={{ flex: 1, height: 1, backgroundColor: "black" }} />
         </View>
+
         <View style={styles.googleButton}>
-          <TouchableOpacity onPress={() => promptAsync()}>
-            <FontAwesome5
-              name="google"
-              size={50}
-              color="black"
-              style={{ textAlign: "center", margin: 10 }}
-            />
-            <Text>Sign In With Google</Text>
-          </TouchableOpacity>
+          <Animated.View
+            entering={SlideInDown}
+            exiting={SlideInUp}
+            layout={Layout.duration(1200)}
+          >
+            <TouchableOpacity onPress={() => promptAsync()}>
+              <FontAwesome5
+                name="google"
+                size={50}
+                color="black"
+                style={{ textAlign: "center", margin: 10 }}
+              />
+              <Text>Sign In With Google</Text>
+            </TouchableOpacity>
+          </Animated.View>
         </View>
       </View>
-    </View>
+    </Animated.View>
   );
 }
 
@@ -230,6 +265,6 @@ const styles = StyleSheet.create({
   },
   text2: {
     fontSize: 15,
-    fontWeight: "bold", 
+    fontWeight: "bold",
   },
 });

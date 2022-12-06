@@ -33,6 +33,7 @@
     "react-google-button": "^0.7.2",
     "react-native": "0.69.6",
     "react-native-confirmation-code-field": "^7.3.1",
+    "react-native-reanimated": "^2.13.0",
     "react-navigation": "^4.4.4"
   },
   "devDependencies": {
