@@ -76,7 +76,7 @@ export default function OtpVerificationScreen({ navigation }) {
     const token = await AsyncStorage.getItem("token");
     try {
       const response = await axios.post(
-        env.RootApi + "/cloudbind/send-otp-email",
+        env.RootApi + "/auth/cloudbind/send-otp-email",
         {
           headers: {
             Authorization: "Bearer " + token,

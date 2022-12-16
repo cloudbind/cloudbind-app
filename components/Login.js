@@ -66,7 +66,6 @@ export default function Login({ navigation }) {
   React.useEffect(() => {
     if (response?.type === "success") {
       const { access_token } = response.params;
-      console.log(access_token);
       async function getUserInfo() {
         try {
           const userInfoResponse = await axios.post(
@@ -85,13 +84,12 @@ export default function Login({ navigation }) {
             userInfoResponse.status === 201
           ) {
             const user = JSON.stringify(userInfoResponse.data.data.user);
-            console.log(user.username);
             await AsyncStorage.setItem(
               "token",
               userInfoResponse.data.data.token
             );
             await AsyncStorage.setItem("user", user);
-            if (user.username === null || user.username === undefined) {
+            if (userInfoResponse.data.data.user.username === null || userInfoResponse.data.data.user.username === undefined) {
               navigation.replace("EnterUsername");
             } else {
               navigation.replace("Home");

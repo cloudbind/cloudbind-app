@@ -40,6 +40,7 @@ function MainFriendPage({ navigation }) {
       );
       if (response.status === 200) {
         alert("Friend Request Sent!");
+        setFreindsList(freindsList.filter((item) => item.id !== id));
       } else {
         alert("Server Error Occured!");
       }
