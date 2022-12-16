@@ -10,6 +10,7 @@ import Login from "./components/Login";
 import EnterUsername from "./components/enterUsername";
 import OtpVerificationScreen from "./components/otpVerification";
 import SignUp from "./components/signUp";
+import FriendsSection from "./components/friendsSection";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -41,8 +42,10 @@ function HomeScreen() {
 
           if (route.name === "Gallery") {
             iconName = "home";
-          } else if (route.name === "Settings") {
-            iconName = "save";
+          } else if (route.name === "Profile") {
+            iconName = "user";
+          }else if (route.name === "Friends") {
+            iconName = "users";
           }
 
           // You can return any component that you like here!
@@ -58,7 +61,12 @@ function HomeScreen() {
         options={{ headerShown: false }}
       />
       <Tab.Screen
-        name="Settings"
+        name="Friends"
+        component={FriendsSection}
+        options={{ headerShown: false }}
+      />
+      <Tab.Screen
+        name="Profile"
         component={SettingsScreen}
         options={{ headerShown: false }}
       />

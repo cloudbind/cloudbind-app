@@ -34,7 +34,8 @@ export default function Login({ navigation }) {
   const [password, setPassword] = React.useState(null);
 
   const handleLogin = async () => {
-    const response = await axios.post(env.RootApi + "/cloudbind/login", {
+    try{
+    const response = await axios.post(env.RootApi + "/auth/cloudbind/login", {
       email: email.trim(),
       password: password.trim(),
     });
@@ -50,6 +51,11 @@ export default function Login({ navigation }) {
     } else {
       alert("Invalid Credentials!");
     }
+  }
+  catch(err){
+    console.log(err);
+    alert("Server Error Occured... Please try again later!");
+  }
     // if (email.trim() === "xxx" && password.trim() === "xxx") {
     //   await AsyncStorage.setItem("token", "abc");
     //   navigation.replace("Home");
@@ -63,7 +69,7 @@ export default function Login({ navigation }) {
       async function getUserInfo() {
         try {
           const userInfoResponse = await axios.post(
-            env.RootApi + "/google/signin",
+            env.RootApi + "/auth/google/signin",
             {
               accessToken: access_token,
             },
@@ -168,7 +174,7 @@ export default function Login({ navigation }) {
             }}
           >
             <Animated.View
-              entering={SlideInRight.duration(1200).delay(800)}
+              entering={SlideInRight.duration(1000).delay(500)}
               exiting={SlideOutRight}
               // layout={Layout.duration(1200).delay(5000)}
             >

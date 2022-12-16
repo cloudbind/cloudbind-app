@@ -20,7 +20,7 @@ function EnterUsername({navigation}) {
     const token = await AsyncStorage.getItem("token");
     try {
       const response = await axios.post(
-        env.RootApi + "/google/set-username",
+        env.RootApi + "/auth/google/set-username",
         {
           username: username.trim(),
         },

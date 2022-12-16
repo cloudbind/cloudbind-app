@@ -47,7 +47,7 @@ export default function SignUp({ navigation }) {
       const trimmedName = name.trim();
       try {
         const response = await axios.post(
-          env.RootApi + "/cloudbind/signup",
+          env.RootApi + "/auth/cloudbind/signup",
           {
             name: trimmedName,
             email: trimmedEmail,

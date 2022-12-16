@@ -237,13 +237,11 @@ export default function Gallery({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
   },
   container2: {
     flex: 1,
-    backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
     marginTop: 40,
@@ -257,7 +255,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: "100%",
     height: 50,
-    backgroundColor: "#fff",
+    // backgroundColor: "#fff",
     position: "absolute",
     bottom: 0,
     left: 0,
@@ -299,7 +297,7 @@ const styles = StyleSheet.create({
   username: {
     width: "100%",
     height: 50,
-    backgroundColor: "#fff",
+    // backgroundColor: "#fff",
     position: "absolute",
     top: 0,
     left: 0,

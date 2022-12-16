@@ -21,7 +21,7 @@ const checkOtp = async () => {
     const authEmailId = await AsyncStorage.getItem('authEmailId');
     const token = await AsyncStorage.getItem('token');
     try {
-    const response = await axios.post(env.RootApi + '/cloudbind/verify-otp', {
+    const response = await axios.post(env.RootApi + '/auth/cloudbind/verify-otp', {
         emailOtp: emailOtp,
         authEmailId: authEmailId,
     },
