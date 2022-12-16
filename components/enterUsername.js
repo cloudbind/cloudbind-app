@@ -13,10 +13,11 @@ import axios from "axios";
 import * as env from "../env.js";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-function EnterUsername({navigation}) {
+function EnterUsername({ navigation }) {
   const [username, setUsername] = React.useState(null);
-
+  const [isLoading, setIsLoading] = React.useState(false);
   const handleUsername = async () => {
+    setIsLoading(true);
     const token = await AsyncStorage.getItem("token");
     try {
       const response = await axios.post(
@@ -26,7 +27,7 @@ function EnterUsername({navigation}) {
         },
         {
           headers: {
-            'Authorization': 'Bearer ' + token,
+            Authorization: "Bearer " + token,
           },
         }
       );
@@ -41,18 +42,18 @@ function EnterUsername({navigation}) {
     } catch (err) {
       console.log(err);
     }
+    setIsLoading(false);
   };
 
-    //  React.useEffect(() => {
-    // async function removeToken() {
-    //   await AsyncStorage.removeItem('token');
-    //   await AsyncStorage.removeItem('user');
-    //   await AsyncStorage.removeItem('authEmailId');
-      
-    // }
-    // removeToken();
-    // }, []);
+  //  React.useEffect(() => {
+  // async function removeToken() {
+  //   await AsyncStorage.removeItem('token');
+  //   await AsyncStorage.removeItem('user');
+  //   await AsyncStorage.removeItem('authEmailId');
 
+  // }
+  // removeToken();
+  // }, []);
 
   return (
     <TouchableWithoutFeedback
@@ -75,9 +76,18 @@ function EnterUsername({navigation}) {
             setUsername(value);
           }}
         />
-        <View style={styles.button}>
-          <Button title="Submit" color="black" onPress={handleUsername} />
-        </View>
+        {isLoading ? (
+          <Lottie
+            source={require("../assets/loading2.json")}
+            loop
+            autoPlay
+            style={{ width: 50 }}
+          />
+        ) : (
+          <View style={styles.button}>
+            <Button title="Submit" color="black" onPress={handleUsername} />
+          </View>
+        )}
       </View>
     </TouchableWithoutFeedback>
   );

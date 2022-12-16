@@ -23,39 +23,40 @@ WebBrowser.maybeCompleteAuthSession();
 
 export default function Login({ navigation }) {
   const [request, response, promptAsync] = Google.useAuthRequest({
-    expoClientId:
-      "970735876329-kp80f3dj4vnoq0qp63q9nij68nhkv0rf.apps.googleusercontent.com",
-    iosClientId: "GOOGLE_GUID.apps.googleusercontent.com",
-    androidClientId: "GOOGLE_GUID.apps.googleusercontent.com",
-    webClientId: "GOOGLE_GUID.apps.googleusercontent.com",
+    expoClientId: env.ExpoClientId,
+    iosClientId: env.iosClientId,
+    androidClientId: env.androidClientId,
+    webClientId: env.webClientId,
   });
 
   const [email, setEmail] = React.useState(null);
   const [password, setPassword] = React.useState(null);
+  const [isLoading, setIsLoading] = React.useState(false);
 
   const handleLogin = async () => {
-    try{
-    const response = await axios.post(env.RootApi + "/auth/cloudbind/login", {
-      email: email.trim(),
-      password: password.trim(),
-    });
-    if (response.status === 200) {
-      const user = JSON.stringify(response.data.data.user);
-      await AsyncStorage.setItem("token", response.data.data.token);
-      await AsyncStorage.setItem("user", user);
-      if (!response.data.data.user.isActivated) {
-        navigation.replace("Activate");
+    setIsLoading(true);
+    try {
+      const response = await axios.post(env.RootApi + "/auth/cloudbind/login", {
+        email: email.trim(),
+        password: password.trim(),
+      });
+      if (response.status === 200) {
+        const user = JSON.stringify(response.data.data.user);
+        await AsyncStorage.setItem("token", response.data.data.token);
+        await AsyncStorage.setItem("user", user);
+        if (!response.data.data.user.isActivated) {
+          navigation.replace("Activate");
+        } else {
+          navigation.replace("Home");
+        }
       } else {
-        navigation.replace("Home");
+        alert("Invalid Credentials!");
       }
-    } else {
-      alert("Invalid Credentials!");
+    } catch (err) {
+      console.log(err);
+      alert("Server Error Occured... Please try again later!");
     }
-  }
-  catch(err){
-    console.log(err);
-    alert("Server Error Occured... Please try again later!");
-  }
+    setIsLoading(false);
     // if (email.trim() === "xxx" && password.trim() === "xxx") {
     //   await AsyncStorage.setItem("token", "abc");
     //   navigation.replace("Home");
@@ -157,7 +158,13 @@ export default function Login({ navigation }) {
           value={password}
           secureTextEntry={true}
         />
-        <View style={styles.button}>
+
+        {isLoading ? (<Lottie
+          source={require("../assets/loading2.json")}
+          loop
+          autoPlay
+          style={{ width: 50 }}
+        />) : (<View style={styles.button}>
           <Button
             title="Login"
             color="black"
@@ -165,9 +172,9 @@ export default function Login({ navigation }) {
               handleLogin();
             }}
           />
-        </View>
+        </View>)}
         <View style={styles.signup}>
-            <Text style={styles.signupText}>Don't have an account?</Text>
+          <Text style={styles.signupText}>Don't have an account?</Text>
           <TouchableOpacity
             onPress={() => {
               navigation.navigate("Signup");
