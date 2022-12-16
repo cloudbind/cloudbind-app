@@ -17,12 +17,14 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import Lottie from "lottie-react-native";
 import axios from "axios";
 import * as env from "../env.js";
+import PageLoading from "./pageLoading.js";
 
 function MainFriendPage({ navigation }) {
   const [search, setSearch] = React.useState("");
   const [freindsList, setFreindsList] = React.useState([]);
   const [myFriendsList, setMyFriendsList] = React.useState([]);
-  const [friendsAnimate, setFriendsAnimate] = React.useState(false);
+  const [isSearchLoading, setIsSearchLoading] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(true);
   const [user, setUser] = React.useState({});
   const sendRequest = async (id) => {
     const token = await AsyncStorage.getItem("token");
@@ -59,9 +61,11 @@ function MainFriendPage({ navigation }) {
       ],
       { cancelable: true }
     );
-  };const fetchDataFriend = async () => {
+  };
+  const fetchDataFriend = async () => {
     const token = await AsyncStorage.getItem("token");
     setUser(JSON.parse(await AsyncStorage.getItem("user")));
+    setRefreshing(true);
     try {
       const response = await axios.get(env.RootApi + "/friend/", {
         headers: {
@@ -69,13 +73,15 @@ function MainFriendPage({ navigation }) {
         },
       });
       setMyFriendsList(response.data.data.friends);
+      setIsLoading(false);
+      setRefreshing(false);
     } catch (err) {
       console.log(err);
       alert("Server Error Occured!");
     }
   };
   React.useEffect(() => {
-    
+    setIsLoading(true);
     fetchDataFriend();
     // setTimeout(() => {
     //   setFriendsAnimate(true);
@@ -83,10 +89,9 @@ function MainFriendPage({ navigation }) {
     // , 3000);
   }, []);
 
-
-
   const fetchData = async () => {
     if (search !== "") {
+      setIsSearchLoading(true);
       const token = await AsyncStorage.getItem("token");
       search.replace(/\s/g, "");
       try {
@@ -99,6 +104,7 @@ function MainFriendPage({ navigation }) {
           }
         );
         setFreindsList(response.data.data.results);
+        setIsSearchLoading(false);
         setRefreshing(false);
       } catch (err) {
         console.log(err);
@@ -113,7 +119,9 @@ function MainFriendPage({ navigation }) {
     if (search === "") setFreindsList([]);
   }, [search]);
 
-  const [refreshing, setRefreshing] = React.useState(true);
+  const [refreshing, setRefreshing] = React.useState(false);
+
+  if(isLoading) return <PageLoading />
 
   return (
     <View style={styles.container}>
@@ -150,7 +158,14 @@ function MainFriendPage({ navigation }) {
           value={search}
         />
       </View>
-      {freindsList.length > 0 && search !== "" ? (
+      {isSearchLoading ? (
+        <Lottie
+          source={require("../assets/loading2.json")}
+          loop
+          autoPlay
+          style={{ width: 70 }}
+        />
+      ) : freindsList.length > 0 && search !== "" ? (
         <View style={styles.friendsList}>
           <FlatList
             data={freindsList}
@@ -198,7 +213,10 @@ function MainFriendPage({ navigation }) {
             keyExtractor={(item) => item._id}
             selected={false}
             refreshControl={
-              <RefreshControl refreshing={refreshing} onRefresh={fetchDataFriend} />
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={fetchDataFriend}
+              />
             }
             renderItem={({ item }) => (
               <LinearGradient

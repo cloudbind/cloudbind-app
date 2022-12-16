@@ -1,14 +1,23 @@
 import React from "react";
-import { Text, StyleSheet, View, FlatList, TouchableOpacity, Alert } from "react-native";
+import {
+  Text,
+  StyleSheet,
+  View,
+  FlatList,
+  TouchableOpacity,
+  Alert,
+} from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { FontAwesome } from "@expo/vector-icons";
 import Lottie from "lottie-react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import * as env from "../env.js";
+import PageLoading from "./pageLoading.js";
 function FriendRequestManage({ navigation }) {
-  const[friendRequests, setFriendRequests] = React.useState([]);
-  const[friendRequestsSent, setFriendRequestsSent] = React.useState([]);
+  const [friendRequests, setFriendRequests] = React.useState([]);
+  const [friendRequestsSent, setFriendRequestsSent] = React.useState([]);
+  const [isLoading, setIsLoading] = React.useState(true);
   const acceptRequest = async (id) => {
     const token = await AsyncStorage.getItem("token");
     try {
@@ -52,8 +61,8 @@ function FriendRequestManage({ navigation }) {
     );
   };
 
-
   React.useEffect(() => {
+    setIsLoading(true);
     async function getFriendRequests() {
       const token = await AsyncStorage.getItem("token");
       try {
@@ -69,7 +78,6 @@ function FriendRequestManage({ navigation }) {
         }
       } catch (err) {
         console.log(err);
-
       }
     }
     getFriendRequests();
@@ -77,13 +85,17 @@ function FriendRequestManage({ navigation }) {
     async function getFriendRequestsSent() {
       const token = await AsyncStorage.getItem("token");
       try {
-        const response = await axios.get(env.RootApi + "/friend/requests-sent", {
-          headers: {
-            Authorization: "Bearer " + token,
-          },
-        });
+        const response = await axios.get(
+          env.RootApi + "/friend/requests-sent",
+          {
+            headers: {
+              Authorization: "Bearer " + token,
+            },
+          }
+        );
         if (response.status === 200) {
           setFriendRequestsSent(response.data.data.friendRequestsSent);
+          setIsLoading(false);
         } else {
           alert("Server Error Occured!");
         }
@@ -96,7 +108,157 @@ function FriendRequestManage({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <View style={styles.freindsHeader}>
+      {isLoading ? (
+        <PageLoading />
+      ) : (
+        <View>
+          <View style={styles.freindsHeader}>
+            <View
+              style={{
+                height: "90%",
+                justifyContent: "center",
+                alignItems: "flex-end",
+                marginRight: 0,
+                marginLeft: 0,
+              }}
+            >
+              <Lottie
+                source={require("../assets/settings2.json")}
+                loop
+                autoPlay
+                style={{ width: 90 }}
+              />
+            </View>
+            <View style={{ marginLeft: 15, padding: 1 }}>
+              <Text style={styles.friendsHeaderText}>Manage Requests</Text>
+            </View>
+          </View>
+          <View style={styles.freindsHeader2}>
+            <Text style={styles.friendsHeaderText2}>Requests Pending</Text>
+          </View>
+          {friendRequests.length > 0 ? (
+            <View style={styles.friendsList2}>
+              <FlatList
+                data={friendRequests}
+                keyExtractor={(item) => item._id}
+                selected={false}
+                renderItem={({ item }) => (
+                  <LinearGradient
+                    colors={["#ffff", "lightgrey", "black"]}
+                    start={{ x: 0.9, y: 0.2 }}
+                    end={{ x: 0.8, y: 1 }}
+                    style={styles.extremeEnds}
+                  >
+                    <View style={styles.friend}>
+                      <View style={styles.friendImage}>
+                        <Text style={styles.friendImageText}>
+                          {item.username[0].toUpperCase()}
+                        </Text>
+                      </View>
+                      <View>
+                        <Text style={styles.friendText}>{item.username}</Text>
+                        <Text style={styles.friendName}>{item.name}</Text>
+                      </View>
+                    </View>
+                    <TouchableOpacity
+                      onPress={() => {
+                        acceptFriendRequest(item._id, item.username);
+                      }}
+                    >
+                      <FontAwesome
+                        name="check-circle"
+                        size={25}
+                        color="darkgreen"
+                      />
+                    </TouchableOpacity>
+                  </LinearGradient>
+                )}
+              />
+            </View>
+          ) : (
+            <View
+              style={{
+                justifyContent: "center",
+                alignItems: "center",
+                marginTop: 20,
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: 15,
+                  fontWeight: "bold",
+                }}
+              >
+                No Requests Pending{" "}
+              </Text>
+              <Lottie
+                source={require("../assets/pending.json")}
+                loop
+                autoPlay
+                style={{ width: 90 }}
+              />
+            </View>
+          )}
+          <View style={styles.freindsHeader2}>
+            <Text style={styles.friendsHeaderText2}>Requests Sent</Text>
+          </View>
+          {friendRequestsSent.length > 0 ? (
+            <View style={styles.friendsList2}>
+              <FlatList
+                data={friendRequestsSent}
+                keyExtractor={(item) => item._id}
+                selected={false}
+                renderItem={({ item }) => (
+                  <LinearGradient
+                    colors={["#ffff", "lightgrey", "black"]}
+                    start={{ x: 0.8, y: 0.9 }}
+                    end={{ x: 0.7, y: 0 }}
+                    style={styles.extremeEnds}
+                  >
+                    <View style={styles.friend}>
+                      <View style={styles.friendImage}>
+                        <Text style={styles.friendImageText2}>
+                          {item.username[0].toUpperCase()}
+                        </Text>
+                      </View>
+                      <View>
+                        <Text style={styles.friendText}>{item.username}</Text>
+                        <Text style={styles.friendName}>{item.name}</Text>
+                      </View>
+                    </View>
+                    <TouchableOpacity onPress={() => {}}>
+                      <FontAwesome name="user" size={20} color="orange" />
+                    </TouchableOpacity>
+                  </LinearGradient>
+                )}
+              />
+            </View>
+          ) : (
+            <View
+              style={{
+                justifyContent: "center",
+                alignItems: "center",
+                marginTop: 30,
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: 15,
+                }}
+              >
+                No Requests Sent
+              </Text>
+              <Lottie
+                source={require("../assets/plane.json")}
+                loop
+                autoPlay
+                style={{ width: 150, marginTop: -10 }}
+              />
+            </View>
+          )}
+        </View>
+      )}
+      {/* <View style={styles.freindsHeader}>
         <View
           style={{
             height: "90%",
@@ -225,8 +387,8 @@ function FriendRequestManage({ navigation }) {
         style={{ width: 150, marginTop: -10 }}
       />
         </View>
-      )}
-      </View>
+      )} */}
+    </View>
   );
 }
 
@@ -235,15 +397,16 @@ export default FriendRequestManage;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-
+    alignItems: "center",
+    justifyContent: "flex-start",
   },
   freindsHeader: {
-    height:30,
-      marginTop: 65,
-      width: "80%",
-      flexDirection: "row",
-      justifyContent: "flex-start",
-      alignItems: "flex-start",
+    height: 30,
+    marginTop: 65,
+    width: "80%",
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    alignItems: "flex-start",
   },
   friendsHeaderText: {
     fontSize: 20,
@@ -355,5 +518,10 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textAlign: "center",
     color: "white",
+  },
+  loading: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

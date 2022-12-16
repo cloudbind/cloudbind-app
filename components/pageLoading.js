@@ -8,7 +8,7 @@ import { View } from "react-native";
 export default function PageLoading() {
   return (
     <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-      <Lottie source={require("../assets/loading3.json")} loop autoPlay style={{width: 350}}/>
+      <Lottie source={require("../assets/loading4.json")} loop autoPlay style={{width: 200}}/>
     </View>
     // <Video
     //   source={PageLoad}

@@ -11,6 +11,7 @@ import EnterUsername from "./components/enterUsername";
 import OtpVerificationScreen from "./components/otpVerification";
 import SignUp from "./components/signUp";
 import FriendsSection from "./components/friendsSection";
+import ProfilePage from "./components/profilePage";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -67,7 +68,7 @@ function HomeScreen() {
       />
       <Tab.Screen
         name="Profile"
-        component={SettingsScreen}
+        component={ProfilePage}
         options={{ headerShown: false }}
       />
     </Tab.Navigator>
