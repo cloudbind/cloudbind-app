@@ -130,7 +130,8 @@ export default function Gallery({ navigation }) {
             try{
             const token = await AsyncStorage.getItem("token");
             const response = await axios.post(
-              "http://192.168.29.171:5001/api/upload",formData,
+              env.RootApi + "/upload"
+              ,formData,
               {
                 headers: {
                   "Content-Type":'multipart/form-data',

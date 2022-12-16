@@ -52,7 +52,6 @@ function ProfilePage({ navigation }) {
         setUser(JSON.parse(user));
         setIsVisible(JSON.parse(user).isVisible);
         setIsLoading(false);
-        alert("Visibility Updated!");
       } else {
         alert("Server Error Occured!");
       }
