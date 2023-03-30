@@ -146,7 +146,7 @@ export default function Gallery({ navigation }) {
               alert("Upload Failed");
             }
           }catch(error){
-            console.log(error);
+            alert(error.response.data.message)
           }
           }},
       ]

@@ -37,8 +37,7 @@ function FriendRequestManage({ navigation }) {
         alert("Server Error Occured!");
       }
     } catch (err) {
-      console.log(err);
-      alert("Server Error Occured!");
+      alert(err.response.data.message);
     }
   };
   const acceptFriendRequest = async (id, username) => {
@@ -77,7 +76,7 @@ function FriendRequestManage({ navigation }) {
           alert("Server Error Occured!");
         }
       } catch (err) {
-        console.log(err);
+        alert(err.response.data.message);
       }
     }
     getFriendRequests();
@@ -100,7 +99,7 @@ function FriendRequestManage({ navigation }) {
           alert("Server Error Occured!");
         }
       } catch (err) {
-        console.log(err);
+        alert(err.response.data.message)
       }
     }
     getFriendRequestsSent();
@@ -118,7 +117,7 @@ function FriendRequestManage({ navigation }) {
             justifyContent: "center",
             alignItems: "flex-end",
             marginRight: 0,
-            marginLeft: 0,
+            marginLeft: -35,
 
           }}
         >
@@ -179,6 +178,7 @@ function FriendRequestManage({ navigation }) {
         <Text style={{
           fontSize: 15,
           fontWeight: "bold",
+          color: "grey",
         }}>No Requests Pending </Text>
         <Lottie
         source={require("../assets/pending.json")}
@@ -233,6 +233,7 @@ function FriendRequestManage({ navigation }) {
         <Text style={{
           fontSize: 15,
           fontWeight: "bold",
+          color: "grey",
         }}>No Requests Sent</Text>
         <Lottie
         source={require("../assets/plane.json")}
@@ -253,9 +254,10 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "flex-start",
+    backgroundColor: "black",
   },
   freindsHeader: {
-    height: 30,
+    height: 50,
     marginTop: 65,
     width: "90%",
     flexDirection: "row",
@@ -263,9 +265,9 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
   },
   friendsHeaderText: {
-    fontSize: 20,
+    fontSize: 30,
     fontWeight: "bold",
-    color: "#000",
+    color: "white",
   },
   friendsHeaderText2: {
     fontSize: 20,

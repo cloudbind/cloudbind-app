@@ -53,8 +53,7 @@ export default function Login({ navigation }) {
         alert("Invalid Credentials!");
       }
     } catch (err) {
-      console.log(err);
-      alert("Server Error Occured... Please try again later!");
+      alert(err.response.data.message);
     }
     setIsLoading(false);
     // if (email.trim() === "xxx" && password.trim() === "xxx") {
@@ -98,7 +97,7 @@ export default function Login({ navigation }) {
             alert("Something went wrong!");
           }
         } catch (error) {
-          console.log(error);
+          alert(error.response.data.message);
         }
       }
       getUserInfo();
@@ -133,12 +132,12 @@ export default function Login({ navigation }) {
       exiting={FadeOut}
       layout={Layout.duration(400)}
     >
-      <View style={styles.container}>
+      <View style={styles.containeradjust}>
         <Lottie
           source={require("../assets/animation.json")}
           loop
           autoPlay
-          style={{ width: 250, marginVertical: 40 }}
+          style={{ width: 250, marginTop: 55 }}
         />
       </View>
       <Text style={styles.title}>Login</Text>
@@ -146,6 +145,7 @@ export default function Login({ navigation }) {
         <TextInput
           style={styles.input}
           placeholder="Email"
+          keyboardType="email-address"
           onChangeText={(val) => setEmail(val)}
           value={email}
         />
@@ -236,8 +236,17 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    // marginTop: 20,
+    marginBottom: -10,
+    backgroundColor: "#fff",
+  },
+  containeradjust: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
     marginTop: 20,
     marginBottom: -10,
+    backgroundColor: "#fff",
   },
   container2: {
     flex: 4,
@@ -249,7 +258,7 @@ const styles = StyleSheet.create({
     fontSize: 30,
     fontWeight: "bold",
     textAlign: "center",
-    marginTop: 120,
+    marginTop: 170,
   },
   googleButton: {
     // backgroundColor: "#fff",

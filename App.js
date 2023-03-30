@@ -12,6 +12,8 @@ import OtpVerificationScreen from "./components/otpVerification";
 import SignUp from "./components/signUp";
 import FriendsSection from "./components/friendsSection";
 import ProfilePage from "./components/profilePage";
+import GroupManage from "./components/groupManage";
+import GoogleDrive from "./components/googleDrive";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -45,15 +47,21 @@ function HomeScreen() {
             iconName = "home";
           } else if (route.name === "Profile") {
             iconName = "user";
-          }else if (route.name === "Friends") {
+          }else if (route.name === "Group") {
+            iconName = "images";
+          }
+          else if (route.name === "Friends") {
             iconName = "users";
           }
 
           // You can return any component that you like here!
           return <Entypo name={iconName} size={size} color={color} />;
         },
-        tabBarActiveTintColor: "tomato",
+        tabBarActiveTintColor: "lightblue",
         tabBarInactiveTintColor: "gray",
+        tabBarActiveBackgroundColor: "black",
+        tabBarInactiveBackgroundColor: "black",
+        
       })}
     >
       <Tab.Screen
@@ -64,6 +72,11 @@ function HomeScreen() {
       <Tab.Screen
         name="Friends"
         component={FriendsSection}
+        options={{ headerShown: false }}
+      />
+      <Tab.Screen
+        name="Group"
+        component={GroupManage}
         options={{ headerShown: false }}
       />
       <Tab.Screen

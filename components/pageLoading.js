@@ -7,7 +7,7 @@ import { View } from "react-native";
 
 export default function PageLoading() {
   return (
-    <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+    <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor:"black"}}>
       <Lottie source={require("../assets/loading4.json")} loop autoPlay style={{width: 200}}/>
     </View>
     // <Video

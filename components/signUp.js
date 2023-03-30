@@ -12,7 +12,14 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import Animated, { RollInLeft, RollInRight, LightSpeedInLeft, LightSpeedInRight, RollOutRight, RollOutLeft } from "react-native-reanimated";
+import Animated, {
+  RollInLeft,
+  RollInRight,
+  LightSpeedInLeft,
+  LightSpeedInRight,
+  RollOutRight,
+  RollOutLeft,
+} from "react-native-reanimated";
 import * as env from "../env.js";
 
 export default function SignUp({ navigation }) {
@@ -39,6 +46,8 @@ export default function SignUp({ navigation }) {
 
   const [selectedOption, setSelectedOption] = React.useState(optionsList[0]);
 
+  const [isLoading, setIsLoading] = React.useState(false);
+
   const handleSignUp = async () => {
     if (password.trim() === confirmPassword.trim()) {
       const trimmedEmail = email.trim();
@@ -46,6 +55,7 @@ export default function SignUp({ navigation }) {
       const trimmedUsername = username.trim();
       const trimmedName = name.trim();
       try {
+        setIsLoading(true);
         const response = await axios.post(
           env.RootApi + "/auth/cloudbind/signup",
           {
@@ -72,36 +82,44 @@ export default function SignUp({ navigation }) {
           alert("Server Error Occured!");
         }
       } catch (err) {
-        console.log(err);
-        alert("Server Error Occured!");
+        alert(err.response.data.message);
       }
     } else {
       alert("Passwords do not match!");
     }
+    setIsLoading(false);
   };
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.container}>
-        <View style={styles.container}>
+        <View style={styles.containeradjust}>
           <Lottie
             source={require("../assets/signup3.json")}
             loop
             autoPlay
-            style={{ width: 290, marginVertical: 90, marginHorizontal: 20 }}
+            style={{ width: 290, marginTop: 50, marginHorizontal: 20 }}
           />
         </View>
         <Text style={styles.title}></Text>
         <View style={styles.container2}>
           {
             <View style={styles.inputContainer}>
-              <Animated.Text entering={LightSpeedInLeft} exiting={LightSpeedInRight} style={styles.label}>{selectedOption.toUpperCase()}</Animated.Text>
+              <Animated.Text
+                entering={LightSpeedInLeft}
+                exiting={LightSpeedInRight}
+                style={styles.label}
+              >
+                {selectedOption.toUpperCase()}
+              </Animated.Text>
               <TextInput
                 style={styles.input}
                 placeholder={selectedOption}
                 secureTextEntry={
                   selectedOption === "password" ||
                   selectedOption === "confirmPassword"
+                    ? true
+                    : false
                 }
                 onChangeText={(text) => {
                   if (selectedOption === "name") {
@@ -177,57 +195,75 @@ export default function SignUp({ navigation }) {
           {selectedOption !== "confirmPassword" ? (
             <View style={styles.nextPrev}>
               <View style={styles.button}>
-                <Animated.View entering={RollInLeft.duration(500)} exiting={RollOutLeft.duration(500)}>
-                <Button
-                  title="Previous"
-                  color="black"
-                  onPress={() => {
-                    const index = optionsList.indexOf(selectedOption);
-                    if (index > 0) {
-                      setSelectedOption(optionsList[index - 1]);
-                    }
-                  }}
-                />
+                <Animated.View
+                  entering={RollInLeft.duration(500)}
+                  exiting={RollOutLeft.duration(500)}
+                >
+                  <Button
+                    title="Previous"
+                    color="black"
+                    onPress={() => {
+                      const index = optionsList.indexOf(selectedOption);
+                      if (index > 0) {
+                        setSelectedOption(optionsList[index - 1]);
+                      }
+                    }}
+                  />
                 </Animated.View>
               </View>
               <View style={styles.button}>
-              <Animated.View entering={RollInRight.duration(500)} exiting={RollOutRight}>
-                <Button
-                  title="Next"
-                  color="black"
-                  onPress={() => {
-                    const index = optionsList.indexOf(selectedOption);
-                    setSelectedOption(optionsList[index + 1]);
-                  }}
-                />
+                <Animated.View
+                  entering={RollInRight.duration(500)}
+                  exiting={RollOutRight}
+                >
+                  <Button
+                    title="Next"
+                    color="black"
+                    onPress={() => {
+                      const index = optionsList.indexOf(selectedOption);
+                      setSelectedOption(optionsList[index + 1]);
+                    }}
+                  />
                 </Animated.View>
               </View>
             </View>
           ) : (
             <View style={styles.nextPrev}>
+              {isLoading ? (
+                  <Lottie
+                    source={require("../assets/loading2.json")}
+                    loop
+                    autoPlay
+                    style={{ width: 80 }}
+                  />
+              ) : (
+                <>
               <View style={styles.button}>
-              <Animated.View entering={RollInLeft.duration(500)} exiting={RollOutLeft.duration(500)}>
-                <Button
-                  title="Previous"
-                  color="black"
-                  onPress={() => {
-                    const index = optionsList.indexOf(selectedOption);
-                    if (index > 0) {
-                      setSelectedOption(optionsList[index - 1]);
-                    }
-                  }}
-                />
+                <Animated.View
+                  entering={RollInLeft.duration(500)}
+                  exiting={RollOutLeft.duration(500)}
+                >
+                  <Button
+                    title="Previous"
+                    color="black"
+                    onPress={() => {
+                      const index = optionsList.indexOf(selectedOption);
+                      if (index > 0) {
+                        setSelectedOption(optionsList[index - 1]);
+                      }
+                    }}
+                  />
                 </Animated.View>
               </View>
-              <View style={styles.button}>
-                <Button
-                  title="Sign Up"
-                  color="black"
-                  onPress={() => {
-                    handleSignUp();
-                  }}
-                />
-              </View>
+                <View style={styles.button}>
+                  <Button
+                    title="Sign Up"
+                    color="black"
+                    onPress={() => {
+                      handleSignUp();
+                    }}
+                  />
+                </View></>)}
             </View>
           )}
           <View style={styles.greetingText}>
@@ -265,9 +301,15 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "#fff",
+  },
+  containeradjust: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
     marginTop: 50,
     marginBottom: 30,
-    // backgroundColor: "#fff",
+    backgroundColor: "#fff",
   },
   container2: {
     flex: 4,
@@ -279,12 +321,13 @@ const styles = StyleSheet.create({
     fontSize: 30,
     fontWeight: "bold",
     textAlign: "center",
-    marginTop: 120,
+    marginTop: 110,
   },
   nextPrev: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    marginTop: -5,
   },
   inputContainer: {
     flexDirection: "column",

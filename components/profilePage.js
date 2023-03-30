@@ -3,33 +3,50 @@ import { Text, StyleSheet, View, Switch, Image, TouchableOpacity } from 'react-n
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import * as env from "../env.js";
+import * as Google from "expo-auth-session/providers/google";
 import { LinearGradient } from 'expo-linear-gradient';
 import Lottie from "lottie-react-native";
+import PageLoading from './pageLoading.js';
 function ProfilePage({ navigation }) {
   const [user, setUser] = React.useState(null);
   const [isVisible, setIsVisible] = React.useState(false);
   const [userPhoto, setUserPhoto] = React.useState(null);
   const [isLoading, setIsLoading] = React.useState(false);
+  const [isMainLoading, setIsMainLoading] = React.useState(true);
+  const [isDriveConnected, setIsDriveConnected] = React.useState(false);
+  const [isDriveLoading, setIsDriveLoading] = React.useState(false);
+
+  const [request, response, promptAsync] =
+  Google.useAuthRequest({
+      clientId: env.ExpoClientId,
+      scopes: ["https://www.googleapis.com/auth/drive"],
+      accessType: "offline",
+    });
   // random string generator
   const randomString = (length) => {
     let result = "";
     const characters =
-      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     const charactersLength = characters.length;
     for (let i = 0; i < length; i++) {
-      result += characters[Math.random() % charactersLength]
+      result += characters[Math.floor(Math.random() * 100) % charactersLength]
     }
     return result;
   };
 
-  React.useEffect(() => {
-    async function getUser() {
-      const user = await AsyncStorage.getItem("user");
-      setUser(JSON.parse(user));
-      setIsVisible(JSON.parse(user).isVisible);
-    }
-    getUser();
+  async function getUser() {
+    setIsMainLoading(true);
+    const user = await AsyncStorage.getItem("user");
+    setUser(JSON.parse(user));
+    setIsVisible(JSON.parse(user).isVisible);
     setUserPhoto(`https://robohash.org/${randomString(3)}.png`);
+    setIsMainLoading(false);
+  }
+
+
+
+  React.useEffect(() => {
+    getUser();
   }, []);
   const adjustVisibility = async () => {
     const token = await AsyncStorage.getItem("token");
@@ -56,20 +73,41 @@ function ProfilePage({ navigation }) {
         alert("Server Error Occured!");
       }
     } catch (err) {
-      console.log(err);
+      alert(err.response.data.message);
     }
   };
+
+  const ConnectGoogleDrive = async () => {
+    setIsDriveLoading(true);
+    if(!isDriveConnected) {
+    const result = await promptAsync();
+    if (result.type === "success") {
+      console.log(result);
+      console.log("Access token = "+result.params.access_token);
+      alert("Access token: " + result.params.access_token);
+    }
+    setIsDriveConnected(true);
+  }else{
+    setIsDriveConnected(false);
+  }
+    setIsDriveLoading(false);
+  }
+
+
+
+  if(isMainLoading) return <PageLoading />;
+
   return (
       <LinearGradient
-              colors={["#ffff", "lightgrey", "black"]}
-              start={{ x: 0.9, y: 0 }}
-              end={{ x: 0, y: 0.5 }}
+              colors={["lightblue", "lightgrey", "black"]}
+              start={{ x: 0.7, y: 0.1 }}
+              end={{ x: 0.9, y: 0.3 }}
               style={styles.container}
             >
       <View style={styles.userAvatar}>
         <Image source={{uri: userPhoto}} style={{width: 100, height: 100, borderRadius: 50}}/>
       </View>
-      <Text style={styles.username}>{user?.username}</Text>
+      <Text style={styles.username}>{user?.username.toUpperCase()}</Text>
       <Text style={styles.email}>{user?.email}</Text>
       {/* toggle button to set visibility */}
       <View style={{ flexDirection: "row", alignItems: "center" }}>
@@ -80,11 +118,26 @@ function ProfilePage({ navigation }) {
             autoPlay
             style={{ width: 40 }}
           />) : <Switch
-          trackColor={{ false: "black", true: "lightblue" }}
+          trackColor={{ false: "blue", true: "lightblue" }}
           thumbColor={isVisible ? "#f5dd4b" : "#f4f3f4"}
           ios_backgroundColor="#3e3e3e"
           onValueChange={adjustVisibility}
           value={isVisible}
+        />}
+      </View>
+      <View style={{ flexDirection: "row", alignItems: "center" }}>
+      <Text style={styles.visibility}>Google Drive: </Text>
+      {isDriveLoading ? (<Lottie
+            source={require("../assets/loading.json")}
+            loop
+            autoPlay
+            style={{ width: 40 }}
+          />) : <Switch
+          trackColor={{ false: "blue", true: "lightblue" }}
+          thumbColor={isVisible ? "#f5dd4b" : "#f4f3f4"}
+          ios_backgroundColor="#3e3e3e"
+          onValueChange={ConnectGoogleDrive}
+          value={isDriveConnected}
         />}
       </View>
       <TouchableOpacity
@@ -129,20 +182,20 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 10,
-    color: 'white'
+    color: 'grey'
   },
   email: {
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 10,
-    color: 'white'
+    color: 'grey'
   },
   visibility: {
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 10,
     marginTop: 5,
-    color: 'white'
+    color: 'grey'
   },
   logoutButton: {
     backgroundColor: 'lightblue',

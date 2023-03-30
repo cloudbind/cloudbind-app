@@ -51,22 +51,20 @@ export default function OtpVerificationScreen({ navigation }) {
         },
         {
           headers: {
-            "Content-Type": "application/json",
             Authorization: "Bearer " + token,
           },
         }
       );
       if (response.status === 200) {
         const user = JSON.stringify(response.data.data.user);
-        const token = response.data.data.token;
-        await AsyncStorage.setItem("token", token);
+        await AsyncStorage.setItem("token", response.data.data.token);
         await AsyncStorage.setItem("user", user);
         navigation.replace("Home");
       } else {
         alert("Invalid OTP!");
       }
     } catch (err) {
-      console.log(err);
+      alert(err.response.data.message);
     }
     setIsLoading(false);
   };
@@ -98,7 +96,7 @@ export default function OtpVerificationScreen({ navigation }) {
         alert("Something went wrong, please try again later");
       }
     } catch (err) {
-      console.log(err);
+      alert(err.response.data.message);
     }
   };
 
@@ -115,7 +113,7 @@ export default function OtpVerificationScreen({ navigation }) {
   return (
     <SafeAreaView style={styles.root}>
       <Text style={styles.title}>Verify the Authorisation Code</Text>
-      <Text style={styles.subTitle}>Sent to {emailId}</Text>
+      <Text style={styles.subTitle}>Sent to entered email id</Text>
       <Lottie
         source={require("../assets/verify.json")}
         loop
@@ -148,12 +146,14 @@ export default function OtpVerificationScreen({ navigation }) {
         <Text style={styles.resendOtpText}>Resend OTP</Text>
       </TouchableOpacity>
       {isLoading ? (
-        <Lottie
-          source={require("../assets/loading2.json")}
-          loop
-          autoPlay
-          style={{ width: 50 }}
-        />
+        <View style={styles.button}>
+          <Lottie
+            source={require("../assets/loading2.json")}
+            loop
+            autoPlay
+            style={{ width: 50 }}
+          />
+        </View>
       ) : (
         <View style={styles.button}>
           <Button title="Submit" onPress={checkOtp} />
@@ -169,6 +169,7 @@ const styles = StyleSheet.create({
     padding: 20,
     alignContent: "center",
     justifyContent: "center",
+    backgroundColor: "#fff",
   },
   title: {
     textAlign: "left",

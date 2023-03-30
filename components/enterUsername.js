@@ -40,7 +40,7 @@ function EnterUsername({ navigation }) {
         alert("Server Error Occured!");
       }
     } catch (err) {
-      console.log(err);
+      alert(err.response.data.message)
     }
     setIsLoading(false);
   };

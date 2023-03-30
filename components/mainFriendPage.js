@@ -45,8 +45,7 @@ function MainFriendPage({ navigation }) {
         alert("Server Error Occured!");
       }
     } catch (err) {
-      console.log(err);
-      alert("Server Error Occured!");
+      alert(err.response.data.message);
     }
   };
   const sendFriendRequest = async (id, username) => {
@@ -65,7 +64,8 @@ function MainFriendPage({ navigation }) {
   };
   const fetchDataFriend = async () => {
     const token = await AsyncStorage.getItem("token");
-    setUser(JSON.parse(await AsyncStorage.getItem("user")));
+    const user = await AsyncStorage.getItem("user");
+    setUser(JSON.parse(user));
     setRefreshing(true);
     try {
       const response = await axios.get(env.RootApi + "/friend/", {
@@ -77,8 +77,7 @@ function MainFriendPage({ navigation }) {
       setIsLoading(false);
       setRefreshing(false);
     } catch (err) {
-      console.log(err);
-      alert("Server Error Occured!");
+      alert(err.response.data.message);
     }
   };
   React.useEffect(() => {
@@ -108,8 +107,7 @@ function MainFriendPage({ navigation }) {
         setIsSearchLoading(false);
         setRefreshing(false);
       } catch (err) {
-        console.log(err);
-        alert("Server Error Occured!");
+        alert(err.response.data.message);
       }
     } else {
       setFreindsList([]);
@@ -122,7 +120,7 @@ function MainFriendPage({ navigation }) {
 
   const [refreshing, setRefreshing] = React.useState(false);
 
-  if(isLoading) return <PageLoading />
+  if (isLoading) return <PageLoading />;
 
   return (
     <View style={styles.container}>
@@ -143,7 +141,9 @@ function MainFriendPage({ navigation }) {
           />
         </View>
         <View style={{ marginLeft: 34, padding: 1 }}>
-          <Text style={styles.friendsHeaderText}>{user.username}</Text>
+          <Text style={styles.friendsHeaderText}>
+            {user.username.toUpperCase()}
+          </Text>
         </View>
       </View>
       <View style={styles.searchBar}>
@@ -245,7 +245,9 @@ function MainFriendPage({ navigation }) {
           />
         </View>
       ) : (
-        <View>
+        <TouchableOpacity onPressOut={fetchDataFriend}>
+        <View
+        >
           <Text style={styles.noFriendsText}>
             Ooops, no connections found:(
           </Text>
@@ -257,6 +259,7 @@ function MainFriendPage({ navigation }) {
             style={{ width: 130, marginLeft: 20 }}
           />
         </View>
+        </TouchableOpacity>
       )}
       <TouchableOpacity
         onPress={() => {
@@ -278,6 +281,7 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
     alignItems: "center",
     flexDirection: "column",
+    backgroundColor: "black",
   },
   searchBar: {
     marginTop: 20,
@@ -305,12 +309,12 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
     height: 30,
   },
-  friendsHeaderText: {
-    fontSize: 20,
-    fontWeight: "bold",
-    textAlign: "center",
-    color: "grey",
-  },
+  // friendsHeaderText: {
+  //   fontSize: 20,
+  //   fontWeight: "bold",
+  //   textAlign: "center",
+  //   color: "grey",
+  // },
   friend: {
     justifyContent: "flex-start",
     alignItems: "center",
@@ -327,6 +331,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textAlign: "center",
     marginTop: 20,
+    color: "grey",
   },
   friendsList: {
     width: "80%",
@@ -381,10 +386,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   friendsHeaderText: {
-    fontSize: 16,
+    fontSize: 25,
     fontWeight: "bold",
     textAlign: "left",
     marginHorizontal: 14,
+    color: "white",
   },
   friendsHeaderText2: {
     fontSize: 20,
