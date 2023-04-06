@@ -8,7 +8,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import * as env from '../env.js';
 
-function GroupManage() {
+function GroupManage({navigation}) {
   const [groups, setGroups] = React.useState([]);
   const [isLoading, setIsLoading] = React.useState(true);
   const [groupName, setGroupName] = React.useState("");
@@ -143,9 +143,9 @@ function GroupManage() {
           <ScrollView style={{maxHeight:200}} horizontal={true}>
           {groups.map((group) => {
             return (
-              <View key={group._id}>
+              <TouchableOpacity key={group._id} onPress={()=>{navigation.navigate("ViewGroup", group)}}>
                 <GroupCard data={group} />
-              </View>
+              </TouchableOpacity>
             );
           })}
         </ScrollView>

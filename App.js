@@ -12,7 +12,7 @@ import OtpVerificationScreen from "./components/otpVerification";
 import SignUp from "./components/signUp";
 import FriendsSection from "./components/friendsSection";
 import ProfilePage from "./components/profilePage";
-import GroupManage from "./components/groupManage";
+import GroupSection from "./components/groupSection";
 import GoogleDrive from "./components/googleDrive";
 
 const Tab = createBottomTabNavigator();
@@ -76,7 +76,7 @@ function HomeScreen() {
       />
       <Tab.Screen
         name="Group"
-        component={GroupManage}
+        component={GroupSection}
         options={{ headerShown: false }}
       />
       <Tab.Screen

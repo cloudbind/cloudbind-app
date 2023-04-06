@@ -1,12 +1,19 @@
-import React from 'react'
-import { Text, StyleSheet, View, Switch, Image, TouchableOpacity } from 'react-native'
+import React from "react";
+import {
+  Text,
+  StyleSheet,
+  View,
+  Switch,
+  Image,
+  TouchableOpacity,
+} from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import * as env from "../env.js";
 import * as Google from "expo-auth-session/providers/google";
-import { LinearGradient } from 'expo-linear-gradient';
+import { LinearGradient } from "expo-linear-gradient";
 import Lottie from "lottie-react-native";
-import PageLoading from './pageLoading.js';
+import PageLoading from "./pageLoading.js";
 function ProfilePage({ navigation }) {
   const [user, setUser] = React.useState(null);
   const [isVisible, setIsVisible] = React.useState(false);
@@ -16,20 +23,24 @@ function ProfilePage({ navigation }) {
   const [isDriveConnected, setIsDriveConnected] = React.useState(false);
   const [isDriveLoading, setIsDriveLoading] = React.useState(false);
 
-  const [request, response, promptAsync] =
-  Google.useAuthRequest({
+  const [request, response, promptAsync] = Google.useAuthRequest(
+    {
       clientId: env.ExpoClientId,
+      clientSecret: env.ExpoClientSecret,
       scopes: ["https://www.googleapis.com/auth/drive"],
       accessType: "offline",
-    });
+    },
+    {
+      authorizationEndpoint: "https://developers.google.com/oauthplayground",
+    }
+  );
   // random string generator
   const randomString = (length) => {
     let result = "";
-    const characters =
-      "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     const charactersLength = characters.length;
     for (let i = 0; i < length; i++) {
-      result += characters[Math.floor(Math.random() * 100) % charactersLength]
+      result += characters[Math.floor(Math.random() * 100) % charactersLength];
     }
     return result;
   };
@@ -42,8 +53,6 @@ function ProfilePage({ navigation }) {
     setUserPhoto(`https://robohash.org/${randomString(3)}.png`);
     setIsMainLoading(false);
   }
-
-
 
   React.useEffect(() => {
     getUser();
@@ -79,66 +88,88 @@ function ProfilePage({ navigation }) {
 
   const ConnectGoogleDrive = async () => {
     setIsDriveLoading(true);
-    if(!isDriveConnected) {
-    const result = await promptAsync();
-    if (result.type === "success") {
-      console.log(result);
-      console.log("Access token = "+result.params.access_token);
-      alert("Access token: " + result.params.access_token);
+    if (!isDriveConnected) {
+      const result = await promptAsync();
+      if (result.type === "success") {
+        try{
+        const dat = {
+          grant_type: 'authorization_code',
+          code: result.params.code,
+          code_verifier: null,
+          client_id: env.ExpoClientId,
+          client_secret: env.ExpoClientSecret,
+          redirect_uri: 'https://developers.google.com/oauthplayground'
+        };
+        console.log(dat);
+        const resp = await axios.post('https://oauth2.googleapis.com/token', dat);
+        console.log(resp);
+      }catch(err){
+        console.log(err.response);
+      }
+        // alert("Access token: " + resp.access_token);
+      }
+      setIsDriveConnected(true);
+    } else {
+      setIsDriveConnected(false);
     }
-    setIsDriveConnected(true);
-  }else{
-    setIsDriveConnected(false);
-  }
     setIsDriveLoading(false);
-  }
+  };
 
-
-
-  if(isMainLoading) return <PageLoading />;
+  if (isMainLoading) return <PageLoading />;
 
   return (
-      <LinearGradient
-              colors={["lightblue", "lightgrey", "black"]}
-              start={{ x: 0.7, y: 0.1 }}
-              end={{ x: 0.9, y: 0.3 }}
-              style={styles.container}
-            >
+    <LinearGradient
+      colors={["lightblue", "lightgrey", "black"]}
+      start={{ x: 0.7, y: 0.1 }}
+      end={{ x: 0.9, y: 0.3 }}
+      style={styles.container}
+    >
       <View style={styles.userAvatar}>
-        <Image source={{uri: userPhoto}} style={{width: 100, height: 100, borderRadius: 50}}/>
+        <Image
+          source={{ uri: userPhoto }}
+          style={{ width: 100, height: 100, borderRadius: 50 }}
+        />
       </View>
       <Text style={styles.username}>{user?.username.toUpperCase()}</Text>
       <Text style={styles.email}>{user?.email}</Text>
       {/* toggle button to set visibility */}
       <View style={{ flexDirection: "row", alignItems: "center" }}>
-      <Text style={styles.visibility}>Visibility: </Text>
-      {isLoading ? (<Lottie
+        <Text style={styles.visibility}>Visibility: </Text>
+        {isLoading ? (
+          <Lottie
             source={require("../assets/loading.json")}
             loop
             autoPlay
             style={{ width: 40 }}
-          />) : <Switch
-          trackColor={{ false: "blue", true: "lightblue" }}
-          thumbColor={isVisible ? "#f5dd4b" : "#f4f3f4"}
-          ios_backgroundColor="#3e3e3e"
-          onValueChange={adjustVisibility}
-          value={isVisible}
-        />}
+          />
+        ) : (
+          <Switch
+            trackColor={{ false: "blue", true: "lightblue" }}
+            thumbColor={isVisible ? "#f5dd4b" : "#f4f3f4"}
+            ios_backgroundColor="#3e3e3e"
+            onValueChange={adjustVisibility}
+            value={isVisible}
+          />
+        )}
       </View>
       <View style={{ flexDirection: "row", alignItems: "center" }}>
-      <Text style={styles.visibility}>Google Drive: </Text>
-      {isDriveLoading ? (<Lottie
+        <Text style={styles.visibility}>Google Drive: </Text>
+        {isDriveLoading ? (
+          <Lottie
             source={require("../assets/loading.json")}
             loop
             autoPlay
             style={{ width: 40 }}
-          />) : <Switch
-          trackColor={{ false: "blue", true: "lightblue" }}
-          thumbColor={isVisible ? "#f5dd4b" : "#f4f3f4"}
-          ios_backgroundColor="#3e3e3e"
-          onValueChange={ConnectGoogleDrive}
-          value={isDriveConnected}
-        />}
+          />
+        ) : (
+          <Switch
+            trackColor={{ false: "blue", true: "lightblue" }}
+            thumbColor={isVisible ? "#f5dd4b" : "#f4f3f4"}
+            ios_backgroundColor="#3e3e3e"
+            onValueChange={ConnectGoogleDrive}
+            value={isDriveConnected}
+          />
+        )}
       </View>
       <TouchableOpacity
         style={styles.logoutButton}
@@ -151,61 +182,61 @@ function ProfilePage({ navigation }) {
       >
         <Text style={styles.logoutButtonText}>Logout</Text>
       </TouchableOpacity>
-      </LinearGradient>
-  )
+    </LinearGradient>
+  );
 }
 
-export default ProfilePage
+export default ProfilePage;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexDirection: 'column',
-    padding: 9
+    alignItems: "center",
+    justifyContent: "center",
+    flexDirection: "column",
+    padding: 9,
   },
   userAvatar: {
     width: 100,
     height: 100,
     borderRadius: 50,
-    backgroundColor: 'lightblue',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "lightblue",
+    alignItems: "center",
+    justifyContent: "center",
     marginBottom: 20,
   },
   userAvatarText: {
     fontSize: 50,
-    color: 'black',
+    color: "black",
   },
   username: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 10,
-    color: 'grey'
+    color: "grey",
   },
   email: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 10,
-    color: 'grey'
+    color: "grey",
   },
   visibility: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 10,
     marginTop: 5,
-    color: 'grey'
+    color: "grey",
   },
   logoutButton: {
-    backgroundColor: 'lightblue',
+    backgroundColor: "lightblue",
     padding: 10,
     borderRadius: 5,
     marginTop: 20,
   },
   logoutButtonText: {
     fontSize: 15,
-    fontWeight: 'bold',
-    color: 'black'
-  }
-})
+    fontWeight: "bold",
+    color: "black",
+  },
+});
